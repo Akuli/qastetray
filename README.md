@@ -1,8 +1,6 @@
 # QasteTray
 
-## Note: QasteTray is not ready yet. If you want a pastebin client that
-actually works you may want to download
-[PasteTray](https://github.com/Akuli/pastetray) instead.
+## Note: QasteTray is not ready yet. If you want a pastebin client that actually works you may want to try [PasteTray](https://github.com/Akuli/pastetray) instead.
 
 QasteTray is a simple tool for using online pastebins written in PyQt5.
 
