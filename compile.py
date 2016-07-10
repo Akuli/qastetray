@@ -31,6 +31,7 @@ using msgfmt.
 import os
 import shutil
 import subprocess
+import sys
 
 import markdown
 from pygments.formatters import HtmlFormatter
@@ -205,6 +206,8 @@ def main():
     resize_icons()
     convert_docs()
     run_msgfmt()
+    print("Everything is ready. Now you can run '{} -m qastetray'."
+          .format(sys.executable))
 
 
 if __name__ == '__main__':
