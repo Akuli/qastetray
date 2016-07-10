@@ -29,8 +29,7 @@ url = 'http://dpaste.com/'
 expiry_days = [1, 7, 30, 365]
 syntax_default = 'Plain text'
 syntax_choices = {
-    # This was generated with scripts/syntax_getters/dpaste.py in the
-    # QasteTray source package.
+    # This was generated with syntax-getters/dpaste.py.
     "RHTML": "rhtml",
     "Io": "io",
     "Myghty": "myghty",

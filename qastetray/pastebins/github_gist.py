@@ -19,7 +19,7 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-"""This is a Paste ofCode file for QasteTray.
+"""This is a GitHub Gist file for QasteTray.
 
 The API documentation is here:
   https://developer.github.com/v3/gists/#create-a-gist

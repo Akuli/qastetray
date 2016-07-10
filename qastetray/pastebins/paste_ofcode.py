@@ -34,8 +34,7 @@ url = 'http://paste.ofcode.org/'
 expiry_days = [7]
 syntax_default = 'Text only'
 syntax_choices = {
-    # This was generated with scripts/syntax_getters/paste_ofcode.py in
-    # the QasteTray source package.
+    # This was generated with syntax-getters/paste_ofcode.py.
     "JavaScript+PHP": "js+php",
     "Zephir": "zephir",
     "Modula-2": "modula2",

@@ -111,8 +111,6 @@ url = 'http://dpaste.com/'
 expiry_days = [1, 7, 30, 365]
 syntax_default = 'Plain text'
 syntax_choices = {
-    # This was generated with scripts/syntax_getters/dpaste.py in the
-    # QasteTray source package.
     "RHTML": "rhtml",
     "Io": "io",
     # (more lines)
@@ -169,10 +167,6 @@ Usually you can use variables with UPPERCASE names. In this case we use
 ```py
 syntax_default = 'Plain text'
 syntax_choices = {
-    # This was generated with scripts/syntax_getters/dpaste.py in the
-    # QasteTray source package.
-    "RHTML": "rhtml",
-    "Io": "io",
     # (more lines)
     "Plain text": "text",
     # (more lines)
@@ -188,7 +182,7 @@ it to the pastebin's equivalent of plain text.
 
 You don't have to copy-paste all syntax choices manually. I recommend
 writing a script to download the syntax choice list for you. See
-`scripts/syntax_getters` for examples.
+`syntax-getters` in the source for examples.
 
 ```py
 paste_args = ['content', 'expiry', 'syntax', 'title', 'username']

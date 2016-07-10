@@ -37,8 +37,7 @@ url = 'https://ghostbin.com/'
 expiry_days = [1, 7, 15]
 syntax_default = 'Plain Text'
 syntax_choices = {
-    # This was generated with scripts/syntax_getters/ghostbin.py in the
-    # QasteTray source package.
+    # This was generated with syntax-getters/ghostbin.py.
     "EBNF": "ebnf",
     "ANSI": "ansi",
     "Docker": "docker",
