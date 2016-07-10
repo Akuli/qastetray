@@ -221,6 +221,7 @@ class _NewPasteWindow(QWidget):
 def new_paste():
     """Create a new paste."""
     window = _NewPasteWindow()
+    window.setWindowTitle("New paste")
     window.resize(600, 400)
     window.show()
     _new_paste_windows.append(window)
