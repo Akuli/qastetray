@@ -42,6 +42,5 @@ VERSION = '1.0-dev'
 KEYWORDS = ['pastebin', 'PyQt5']
 USER_AGENT = 'QasteTray/' + VERSION
 
-PIP_DEPENDS = ['appdirs', 'setuptools', 'requests', 'PyQt5']
-DEBIAN_DEPENDS = ['python3-appdirs', 'python3-pkg-resources',
-                  'python3-requests', 'python3-pyqt5']
+PIP_DEPENDS = ['requests', 'PyQt5']
+DEBIAN_DEPENDS = ['python3-requests', 'python3-pyqt5']
