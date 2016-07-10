@@ -160,12 +160,9 @@ def convert_docs():
                 os.path.join(DOCDIR, 'LICENSE'))
 
     # Icon.
-    try:
-        shutil.copy(os.path.join(ICONDIR, 'hicolor', '16x16',
-                                 'apps', 'qastetray.png'),
-                    os.path.join(DOCDIR, 'icon.png'))
-    except OSError as e:
-        raise OSError("cannot copy icon, run copy_icons.py first") from e
+    shutil.copy(os.path.join(ICONDIR, 'hicolor', '16x16',
+                             'apps', 'qastetray.png'),
+                os.path.join(DOCDIR, 'icon.png'))
 
 
 def _resize_icon(big):
