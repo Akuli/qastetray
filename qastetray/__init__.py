@@ -26,42 +26,14 @@ be clicked and new pastes to online pastebins can be easily made.
 """
 
 
-import gettext
-import locale
-
-from pkg_resources import resource_stream
-
-
-# Internationalization.
-def _get_translations():
-    lang = locale.getdefaultlocale()[0]
-    # Maybe $LANG is C and lang is None?
-    while lang is not None:
-        try:
-            path = 'locale/{}.mo'.format(lang)
-            with resource_stream('qastetray', path) as fp:
-                return gettext.GNUTranslations(fp)
-        except OSError:
-            if '_' in lang:
-                # Remove the last part and keep going.
-                lang = lang.rsplit('_', 1)[0]
-            else:
-                # Give up.
-                lang = None
-    return gettext.NullTranslations()
-
-_ = _get_translations().gettext
-
-
 # Add your name here if you've helped with making this program but your
 # name is not here yet.
 AUTHORS = ["Akuli"]
 TRANSLATORS = {
-    _("Finnish"): "Akuli",
+    'fi': "Akuli",
 }
 
 # General information.
-SHORT_DESC_TRANS = _("Simple program for using online pastebins.")
 SHORT_DESC, LONG_DESC = __doc__.split('\n\n', 1)
 LONG_DESC = LONG_DESC.strip().replace('\n', ' ')
 
