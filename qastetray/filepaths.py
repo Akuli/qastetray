@@ -25,19 +25,12 @@ import configparser
 import os
 import platform
 
-try:
-    # Some versions of PIP come with appdirs.
-    from pip.utils import appdirs   # NOQA
-except ImportError:
-    # Otherwise appdirs needs to be installed.
-    import appdirs      # NOQA
-
 
 # Platform information.
 platform = platform.system()
 
 
-# Where is QasteTray installed?
+# Installation paths.
 def _get_dir(name):
     result = _dirconfig['InstallDirs'][name]
     result = result.split('/')
@@ -54,8 +47,20 @@ localedir = _get_dir('localedir')
 
 
 # User-wide configuration files.
-app = 'QasteTray' if platform == 'Windows' else 'qastetray'
-user_cache_dir = appdirs.user_cache_dir(app)
-user_config_dir = appdirs.user_config_dir(app)
-os.makedirs(user_cache_dir, exist_ok=True)
+if 'APPDATA' in os.environ:
+    # Windows.
+    user_config_dir = os.path.join(os.getenv('APPDATA'), 'QasteTray')
+    user_cache_dir = os.path.join(user_config_dir, 'Cache')
+elif platform == 'Darwin':
+    # Mac OSX.
+    user_config_dir = os.path.expanduser('~/Library/Application Support/'
+                                         'QasteTray')
+    user_cache_dir = os.path.expanduser('~/Library/Caches/QasteTray')
+else:
+    # Probably other UNIX-like.
+    # TODO: Use XDG environment variables when possible.
+    user_config_dir = os.path.expanduser('~/.config/qastetray')
+    user_cache_dir = os.path.expanduser('~/.cache/qastetray')
+
 os.makedirs(user_config_dir, exist_ok=True)
+os.makedirs(user_cache_dir, exist_ok=True)
