@@ -1,0 +1,12 @@
+[Desktop Entry]
+Name=QasteTray
+GenericName=Pastebin client
+GenericName[fi]=Pastebin-asiakasohjelma
+Comment=Use online pastebins easily
+Comment[fi]=Käytä pastebineja helposti
+Exec=qastetray
+Type=Application
+Icon=qastetray
+Terminal=false
+Categories=Network;
+Keywords=pastebin;client;internet;
