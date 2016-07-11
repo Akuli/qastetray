@@ -10,48 +10,12 @@ from PyQt5.QtWidgets import (QComboBox, QDialog, QDialogButtonBox, QGridLayout,
                              QProgressBar, QPushButton, QSizePolicy, QTextEdit,
                              QVBoxLayout, QWidget)
 
-from qastetray import backend, settings
+from qastetray import backend
+from qastetray.settings import settings
 
 
 # The paste windows are added here to avoid garbage collection.
 _new_paste_windows = []
-
-
-class _ContentTextEdit(QTextEdit):
-
-    def __init__(self):
-        super().__init__()
-        self._style_sheet = {}
-        settings.add_postfunc('NewPasteWindow', 'font', self._set_font)
-        settings.add_postfunc('NewPasteWindow', 'fgcolor', self._set_fg)
-        settings.add_postfunc('NewPasteWindow', 'bgcolor', self._set_bg)
-
-    def _set_font(self, font_string):
-        font = QFont()
-        font.fromString(font_string)
-        font.setStyleHint(QFont.Monospace)
-        self.setFont(font)
-
-    def _set_fg(self, color_name):
-        self._style_sheet['color'] = color_name
-        self._apply_style_sheet()
-
-    def _set_bg(self, color_name):
-        self._style_sheet['background-color'] = color_name
-        self._apply_style_sheet()
-
-    def _apply_style_sheet(self):
-        props = (': '.join(prop) for prop in self._style_sheet.items())
-        self.setStyleSheet('; '.join(props))
-
-    def remove_postfuncs(self):
-        """Remove postfuncs added in __init__.
-
-        Run this method before destroying the window this widget is in.
-        """
-        settings.remove_postfunc('NewPasteWindow', 'font', self._set_font)
-        settings.remove_postfunc('NewPasteWindow', 'fgcolor', self._set_fg)
-        settings.remove_postfunc('NewPasteWindow', 'bgcolor', self._set_bg)
 
 
 class PasteSuccessDialog(QDialog):
@@ -62,24 +26,24 @@ class PasteSuccessDialog(QDialog):
         super().__init__(parent)
         self._url = url
 
-        layout = QVBoxLayout()
-        self.setLayout(layout)
+        main_layout = QVBoxLayout()
+        self.setLayout(main_layout)
 
         label = QLabel(_("Pasting succeeded."))
         label.setAlignment(Qt.AlignCenter | Qt.AlignVCenter)
-        layout.addWidget(label)
+        main_layout.addWidget(label)
 
         line_edit = QLineEdit()
         line_edit.setText(url)
         line_edit.selectAll()
         line_edit.setToolTip(_("Highlight and press Ctrl+C to copy"))
         line_edit.setReadOnly(True)
-        layout.addWidget(line_edit)
+        main_layout.addWidget(line_edit)
 
-        layout.addStretch(1)
+        main_layout.addStretch(1)
 
         buttonbox = QDialogButtonBox()
-        layout.addWidget(buttonbox)
+        main_layout.addWidget(buttonbox)
 
         browser_button = QPushButton(_("O&pen in browser"))
         browser_button.clicked.connect(self._open_in_browser_clicked)
@@ -99,35 +63,38 @@ class _NewPasteWindow(QWidget):
     def __init__(self):
         super().__init__()
 
-        vbox = QVBoxLayout()
-        self.setLayout(vbox)
+        main_layout = QVBoxLayout()
+        self.setLayout(main_layout)
 
-        self._create_edits()
-        self._create_forms()
-        self._create_bottom_widgets()
-
-    def _create_edits(self):
-        """Create the title line edit and content text edit."""
+        # Title line edit.
         self._title_line_edit = QLineEdit()
         self._title_line_edit.setToolTip(_("Title of your paste (optional)"))
-        self.layout().addWidget(self._title_line_edit)
+        main_layout.addWidget(self._title_line_edit)
 
-        # TODO: Use a monospace font.
-        self._content_text_edit = _ContentTextEdit()
-        self._content_text_edit.setToolTip(_("The content to paste"))
-        self.layout().addWidget(self._content_text_edit)
+        # Content text edit.
+        content = self._content_text_edit = QTextEdit()
+        content.setToolTip(_("The content to paste"))
+        content.setStyleSheet('color: {fg}; background-color: {bg}'.format(
+            fg=settings['NewPasteWindow']['fgcolor'],
+            bg=settings['NewPasteWindow']['bgcolor'],
+        ))
+        main_layout.addWidget(content)
 
-    def _create_forms(self):
-        """Create the 'forms' in the middle."""
+        font = QFont()
+        font.fromString(settings['NewPasteWindow']['font'])
+        font.setStyleHint(QFont.Monospace)
+        content.setFont(font)
+
+        # 'Forms' in the middle.
         self._pastebin_combo = pastebin = QComboBox()
         self._expiry_combo = expiry = QComboBox()
         self._name_line_edit = name = QLineEdit()
         self._syntax_line_edit = syntax = QLineEdit()
 
-        # This is not a form layout because it has four columns instead
+        # This is not a form main_layout because it has four columns instead
         # of two.
         grid = QGridLayout()
-        self.layout().addLayout(grid)
+        main_layout.addLayout(grid)
 
         widgets = [
             (_("Pastebin:"), pastebin, _("Name or nick:"), name),
@@ -144,17 +111,16 @@ class _NewPasteWindow(QWidget):
                     item.setSizePolicy(policy)
                 grid.addWidget(item, y, x)
 
-    def _create_bottom_widgets(self):
-        """Create the progressbar and buttons."""
+        # Progress bar and buttons.
         hbox = QHBoxLayout()
-        self.layout().addLayout(hbox)
+        main_layout.addLayout(hbox)
 
         progressbar = self._progressbar = QProgressBar()
         hbox.addWidget(progressbar)
 
-        ok_button = QPushButton(_("Paste!"))
-        ok_button.clicked.connect(self._paste)
-        hbox.addWidget(ok_button)
+        paste_button = QPushButton(_("Paste!"))
+        paste_button.clicked.connect(self._paste)
+        hbox.addWidget(paste_button)
 
         cancel_button = QPushButton(_("Cancel"))
         cancel_button.clicked.connect(self.close)
@@ -162,7 +128,7 @@ class _NewPasteWindow(QWidget):
 
     def _paste(self):
         """Start pasting."""
-        self._progressbar.setRange(0, 0)  # Moving back and forth.
+        self._progressbar.setRange(0, 0)  # Move back and forth.
         pastebin = backend.pastebins['dpaste']
         getters = {
             'content': self._content_text_edit.toPlainText,
@@ -177,7 +143,7 @@ class _NewPasteWindow(QWidget):
 
     def _pasting_finished(self):
         """End pasting."""
-        self._progressbar.setRange(0, 1)  # Staying at 0%.
+        self._progressbar.setRange(0, 1)  # Stay at 0%.
         if self._pasting_thread.success:
             dialog = PasteSuccessDialog(self._pasting_thread.response, self)
             dialog.resize(300, 200)
@@ -213,7 +179,6 @@ class _NewPasteWindow(QWidget):
             if reply == QMessageBox.No:
                 event.ignore()
                 return
-        self._content_text_edit.remove_postfuncs()
         _new_paste_windows.remove(self)
         event.accept()
 

@@ -37,12 +37,6 @@ import markdown
 from pygments.formatters import HtmlFormatter
 
 
-TOPDIR = os.path.dirname(os.path.abspath(__file__))
-DOCDIR = os.path.join(TOPDIR, 'doc')
-ICONDIR = os.path.join(TOPDIR, 'icons')
-LOCALEDIR = os.path.join(TOPDIR, 'locale')
-
-
 CSS_TEMPLATE = """\
 /* This file is used as a style file for QasteTray HTML documentation. */
 
@@ -145,25 +139,24 @@ def convert_docs():
     files = [('README.md', 'index.html'),
              ('writing-pastebins.md', 'writing-pastebins.html')]
     for src, dst in files:
-        with open(os.path.join(TOPDIR, src), 'r') as f:
+        with open(src, 'r') as f:
             md = f.read()
         html = _make_html(md)
-        with open(os.path.join(DOCDIR, dst), 'w') as f:
+        with open(os.path.join('doc', dst), 'w') as f:
             f.write(html)
 
     # CSS file.
     css = _make_css()
-    with open(os.path.join(DOCDIR, 'style.css'), 'w') as f:
+    with open(os.path.join('doc', 'style.css'), 'w') as f:
         f.write(css)
 
     # LICENSE file.
-    shutil.copy(os.path.join(TOPDIR, 'LICENSE'),
-                os.path.join(DOCDIR, 'LICENSE'))
+    shutil.copy('LICENSE', os.path.join('doc', 'LICENSE'))
 
     # Icon.
-    shutil.copy(os.path.join(ICONDIR, 'hicolor', '16x16',
+    shutil.copy(os.path.join('icons', 'hicolor', '16x16',
                              'apps', 'qastetray.png'),
-                os.path.join(DOCDIR, 'icon.png'))
+                os.path.join('doc', 'icon.png'))
 
 
 def _resize_icon(big):
@@ -182,8 +175,8 @@ def resize_icons():
 
     TODO: Support more icons than qastetray.png.
     """
-    for theme in os.listdir(ICONDIR):
-        big_icon_dir = os.path.join(ICONDIR, theme, '256x256')
+    for theme in os.listdir('icons'):
+        big_icon_dir = os.path.join('icons', theme, '256x256')
         if not os.path.isdir(big_icon_dir):
             continue
         for root, dirs, files in os.walk(big_icon_dir):
@@ -193,8 +186,8 @@ def resize_icons():
 
 def run_msgfmt():
     """Convert .po files to .mo files."""
-    for language in os.listdir(LOCALEDIR):
-        msgdir = os.path.join(LOCALEDIR, language, 'LC_MESSAGES')
+    for language in os.listdir('locale'):
+        msgdir = os.path.join('locale', language, 'LC_MESSAGES')
         if not os.path.isfile(os.path.join(msgdir, 'qastetray.po')):
             continue
         subprocess.check_call(['msgfmt', os.path.join(msgdir, 'qastetray.po'),
@@ -206,9 +199,9 @@ def main():
     resize_icons()
     convert_docs()
     run_msgfmt()
-    print("Everything is ready. Now you can run '{} -m qastetray'."
-          .format(sys.executable))
 
 
 if __name__ == '__main__':
     main()
+    print("Compiling succeeded.")
+    print("Now you can run '{} -m qastetray'.".format(sys.executable))

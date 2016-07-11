@@ -25,8 +25,9 @@ from gettext import gettext as _
 import sys
 
 from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5.QtWidgets import QDialogButtonBox, QPushButton
 
-from qastetray import settings
+from qastetray.settings import settings
 
 
 class _ColorButton(QtWidgets.QPushButton):
@@ -107,57 +108,68 @@ class _SettingDialog(QtWidgets.QDialog):
         super().__init__()
         self.setWindowTitle("QasteTray settings")
 
-        layout = QtWidgets.QVBoxLayout()
-        self.setLayout(layout)
+        main_layout = QtWidgets.QVBoxLayout()
+        self.setLayout(main_layout)
 
-        form = self._make_form_in_groupbox(_("New paste window"))
+        form = self._make_form_in_group(_("New paste window"))
 
-        combo = QtWidgets.QComboBox()
-        for index, (name, value) in enumerate(_wrap_modes):
-            combo.addItem(name)
-            if value == settings.get_str('NewPasteWindow', 'wrap'):
-                combo.setCurrentIndex(index)
-        combo.currentIndexChanged.connect(self._wrap_changed)
-        form.addRow(_("Text wrapping:"), combo)
+        names, attrs = zip(*_wrap_modes)
+        attr = settings['NewPasteWindow']['wrap']
+        self._wrap_combo = QtWidgets.QComboBox()
+        self._wrap_combo.addItems(names)
+        self._wrap_combo.setCurrentIndex(attrs.index(attr))
+        form.addRow(_("Text wrapping:"), self._wrap_combo)
 
-        button = _FontButton(settings.get_str('NewPasteWindow', 'font'))
-        button.selection_changed.connect(self._font_changed)
-        form.addRow(_("Font:"), button)
+        self._font_button = _FontButton(settings['NewPasteWindow']['font'])
+        form.addRow(_("Font:"), self._font_button)
 
-        button = _ColorButton(settings.get_str('NewPasteWindow', 'fgcolor'))
-        button.selection_changed.connect(self._fg_changed)
-        form.addRow(_("Foreground color:"), button)
+        self._fg_button = _ColorButton(settings['NewPasteWindow']['fgcolor'])
+        form.addRow(_("Foreground color:"), self._fg_button)
 
-        button = _ColorButton(settings.get_str('NewPasteWindow', 'bgcolor'))
-        button.selection_changed.connect(self._bg_changed)
-        form.addRow(_("Background color"), button)
+        self._bg_button = _ColorButton(settings['NewPasteWindow']['bgcolor'])
+        form.addRow(_("Background color:"), self._bg_button)
 
-    def _make_form_in_groupbox(self, label):
+        main_layout.addStretch(1)
+
+        buttonbox = QDialogButtonBox()
+        main_layout.addWidget(buttonbox)
+
+        apply_button = QPushButton(_("&Apply"))
+        apply_button.clicked.connect(self._apply)
+        buttonbox.addButton(apply_button, QDialogButtonBox.ApplyRole)
+
+        ok_button = QPushButton("&OK")
+        ok_button.clicked.connect(self._ok)
+        buttonbox.addButton(ok_button, QDialogButtonBox.AcceptRole)
+
+        cancel_button = QPushButton(_("&Cancel"))
+        cancel_button.clicked.connect(self.close)
+        buttonbox.addButton(cancel_button, QDialogButtonBox.RejectRole)
+
+    def _make_form_in_group(self, label_text):
         """Create and return a QFormLayout in a QGroupBox.
 
-        The group box is added to self.layout.
+        The group box is added to the main main_layout.
         """
-        group = QtWidgets.QGroupBox()
+        group = QtWidgets.QGroupBox(label_text)
         self.layout().addWidget(group)
         form = QtWidgets.QFormLayout()
         group.setLayout(form)
         return form
 
-    def _wrap_changed(self, index):
-        """Change wrap mode."""
-        settings.set_str('NewPasteWindow', 'wrap', _wrap_modes[index][1])
+    def _ok(self):
+        """Save the settings and close the dialog."""
+        self._apply()
+        self.close()
 
-    def _font_changed(self, font_name):
-        """Change font."""
-        settings.set_str('NewPasteWindow', 'font', font_name)
-
-    def _fg_changed(self, color_name):
-        """Change foreground color."""
-        settings.set_str('NewPasteWindow', 'fgcolor', color_name)
-
-    def _bg_changed(self, color_name):
-        """Change background color."""
-        settings.set_str('NewPasteWindow', 'bgcolor', color_name)
+    def _apply(self):
+        """Save the settings."""
+        font = self._font_button.get_font_string()
+        fg = self._fg_button.get_color_name()
+        bg = self._bg_button.get_color_name()
+        settings['NewPasteWindow']['font'] = font
+        settings['NewPasteWindow']['fg'] = fg
+        settings['NewPasteWindow']['bg'] = bg
 
 
 def run():
@@ -165,5 +177,5 @@ def run():
     global _dialog      # Avoid garbage collection
     _dialog = _SettingDialog()
     _dialog.setWindowTitle(_("QasteTray preferences"))
-    _dialog.resize(600, 400)
+    _dialog.resize(400, 300)
     _dialog.show()

@@ -29,6 +29,7 @@ be clicked and new pastes to online pastebins can be easily made.
 # Add your name here if you've helped with making this program but your
 # name is not here yet.
 AUTHORS = ["Akuli"]
+MAINTAINER = "Akuli"
 TRANSLATORS = {
     'fi': "Akuli",
 }

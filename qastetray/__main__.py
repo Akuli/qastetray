@@ -23,13 +23,13 @@
 
 import argparse
 import gettext
-from gettext import gettext as _
 import sys
+import time
 
 from PyQt5 import QtWidgets
 
-from qastetray import (SHORT_DESC_TRANS, backend, filepaths, lock, new_paste,
-                       settings)  # , setting_dialog)
+from qastetray import (backend, filepaths, lock, new_paste,
+                       settings, setting_dialog)
 
 
 def main(args=None):
@@ -40,9 +40,14 @@ def main(args=None):
     # Internationalization.
     gettext.bindtextdomain('qastetray', filepaths.localedir)
     gettext.textdomain('qastetray')
+    _ = gettext.gettext
+
+    # This is not taken from __init__.py because it doesn't have gettext
+    # set up.
+    description = _("Simple pastebin client.")
 
     # TODO: Add arguments to parse.
-    parser = argparse.ArgumentParser(description=SHORT_DESC_TRANS)
+    parser = argparse.ArgumentParser(description=description)
     parser.parse_args(args[1:])
 
     app = QtWidgets.QApplication(args)
@@ -50,7 +55,8 @@ def main(args=None):
         with lock.locked():
             settings.load()
             backend.load()
-            new_paste.new_paste()
+            setting_dialog.run()
+#            new_paste.new_paste()
 
     except lock.IsLocked:
         QtWidgets.QMessageBox.info(
