@@ -33,8 +33,7 @@ platform = platform.system()
 # Installation paths.
 def _get_dir(name):
     result = _dirconfig['InstallDirs'][name]
-    result = result.split('/')
-    result = os.path.join(pydir, *result)
+    result = os.path.join(pydir, result)
     return os.path.abspath(result)
 
 pydir = os.path.dirname(os.path.abspath(__file__))
@@ -58,7 +57,6 @@ elif platform == 'Darwin':
     user_cache_dir = os.path.expanduser('~/Library/Caches/QasteTray')
 else:
     # Probably other UNIX-like.
-    # TODO: Use XDG environment variables when possible.
     user_config_dir = os.path.expanduser('~/.config/qastetray')
     user_cache_dir = os.path.expanduser('~/.cache/qastetray')
 
