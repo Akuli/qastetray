@@ -19,33 +19,39 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-"""Setting manager for QasteTray.
-
-The setting changing dialog is in setting_dialog.py.
-"""
+"""Setting manager for QasteTray."""
 
 import configparser
 import os
 
-from qastetray import filepaths
+from qastetray.core import filepaths
 
 
-_DEFAULT_SETTINGS = os.path.join(filepaths.pydir, 'qastetray.conf')
-_USER_SETTINGS = os.path.join(filepaths.user_config_dir, 'qastetray.conf')
-
-settings = configparser.ConfigParser(
-    dict_type=dict,         # No need for ordering.
-    interpolation=None,     # Allow % in values.
-)
+_configs = {}
 
 
-def load():
-    """Load configuration files."""
-    settings.read([_DEFAULT_SETTINGS, _USER_SETTINGS])
+def get(filename):
+    """Load a configuration file.
+
+    Return a configparser.ConfigParser. The parsers are cached, so if
+    this function is called multiple times with the same argument it
+    will always return the same parser.
+    """
+    if filename not in _configs:
+        _configs[filename] = configparser.ConfigParser(
+            dict_type=dict,         # No need for ordering
+            interpolation=None,     # Allow % signs in values.
+        )
+        _configs[filename].read([
+            os.path.join(filepaths.topdir, filename),
+            os.path.join(filepaths.userconfigdir, filename),
+        ])
+    return _configs[filename]
 
 
 def save():
-    """Save to the user-wide configuration files."""
-    with open(_USER_SETTINGS, 'w') as f:
-        print("# Configuartion file for QasteTray.", file=f)
-        settings.write(f)
+    """Save all loaded configuration files."""
+    for filename, config in _configs.items():
+        path = os.path.join(filepaths.userconfigdir, filename)
+        with open(path, 'w') as f:
+            config.write(f)

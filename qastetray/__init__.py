@@ -21,8 +21,11 @@
 
 """Simple program for using online pastebins.
 
-This program displays a paste icon in the system tray. The tray icon can
-be clicked and new pastes to online pastebins can be easily made.
+QasteTray displays a paste icon in the system tray. The tray icon can be
+clicked and new pastes to online pastebins can be easily made.
+
+QasteTray is highly extensible. There are many ways to write custom
+pastebins, such as Python scripting.
 """
 
 
@@ -36,7 +39,7 @@ TRANSLATORS = {
 
 # General information.
 SHORT_DESC, LONG_DESC = __doc__.split('\n\n', 1)
-LONG_DESC = LONG_DESC.strip().replace('\n', ' ')
+LONG_DESC = LONG_DESC.strip()
 
 URL = 'https://github.com/Akuli/qastetray/'
 VERSION = '1.0-dev'

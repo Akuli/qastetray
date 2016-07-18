@@ -19,21 +19,20 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-"""A cross-platform file locker for QasteTray."""
+"""A cross-platform file locker for QasteTray.
+
+Use the locked context manager in a main function. It will raise
+IsLocked if the lockfile has been locked by another process.
+"""
 
 import contextlib
 import os
 import platform
 
-from qastetray import filepaths
+from qastetray.core import filepaths
 
-_WINDOWS = (platform.system() == 'Windows')
-if _WINDOWS:
-    import msvcrt       # NOQA
-else:
-    import fcntl        # NOQA
 
-_LOCKFILE = os.path.join(filepaths.user_cache_dir, 'lock')
+_LOCKFILE = os.path.join(filepaths.usercachedir, 'lock')
 
 
 class IsLocked(OSError):
@@ -42,7 +41,7 @@ class IsLocked(OSError):
 
 @contextlib.contextmanager
 def _windows_locked():
-    """Lock-and-unlock context manager for Windows."""
+    """Locking context manager for Windows."""
     with open(_LOCKFILE, 'w') as f:
         try:
             # The lockfile needs to contain something to lock.
@@ -58,14 +57,19 @@ def _windows_locked():
 
 @contextlib.contextmanager
 def _unix_locked():
-    """Lock-and-unlock context manager for Unix-like operating systems."""
-    with open(_LOCKFILE, 'w') as fd:
+    """Locking context manager for Unix-like operating systems."""
+    with open(_LOCKFILE, 'w') as f:
         try:
-            fcntl.lockf(fd, fcntl.LOCK_EX | fcntl.LOCK_NB)
+            fcntl.lockf(f, fcntl.LOCK_EX | fcntl.LOCK_NB)
         except OSError as e:
             raise IsLocked from e
         yield
-        fcntl.lockf(fd, fcntl.LOCK_UN)
+        fcntl.lockf(f, fcntl.LOCK_UN)
 
 
-locked = _windows_locked if _WINDOWS else _unix_locked
+if platform.system() == 'Windows':
+    import msvcrt       # NOQA
+    locked = _windows_locked
+else:
+    import fcntl        # NOQA
+    locked = _unix_locked

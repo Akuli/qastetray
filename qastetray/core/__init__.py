@@ -19,57 +19,30 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-"""Run the program."""
+"""Define more functions."""
 
-import argparse
 import gettext
-import sys
-import time
+import os
+from urllib.request import pathname2url
+import webbrowser
 
-from PyQt5 import QtWidgets
-
-from qastetray import (backend, filepaths, lock, new_paste,
-                       settings, setting_dialog)
+from qastetray.core import filepaths
 
 
-def main(args=None):
-    """Run the program."""
-    if args is None:
-        args = sys.argv
-
-    # Internationalization.
+def load_gettext():
+    """Set up gettext."""
     gettext.bindtextdomain('qastetray', filepaths.localedir)
     gettext.textdomain('qastetray')
-    _ = gettext.gettext
 
-    # This is not taken from __init__.py because it doesn't have gettext
-    # set up.
-    description = _("Simple pastebin client.")
 
-    # TODO: Add arguments to parse.
-    parser = argparse.ArgumentParser(description=description)
-    parser.parse_args(args[1:])
+def help():
+    """Display the help HTML page in a web browser."""
+    path = os.path.join(filepaths.docdir, 'index.html')
+    url = 'file://' + pathname2url(path)
 
-    app = QtWidgets.QApplication(args)
+    # On X.Org, webbrowser.open() uses xdg-open by default instead of
+    # x-www-browser, so HTML files don't always open in a WWW browser.
     try:
-        with lock.locked():
-            settings.load()
-            backend.load()
-            setting_dialog.run()
-#            new_paste.new_paste()
-
-    except lock.IsLocked:
-        QtWidgets.QMessageBox.info(
-            "QasteTray", _("{} is already running.").format("QasteTray"),
-            QtWidgets.QMessageBox.Ok, QtWidgets.QMessageBox.Ok,
-        )
-
-    finally:
-        settings.save()
-        backend.save()
-
-    sys.exit(app.exec_())
-
-
-if __name__ == '__main__':
-    main()
+        webbrowser.get('x-www-browser').open(url)
+    except webbrowser.Error:
+        webbrowser.open(url)

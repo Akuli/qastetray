@@ -19,11 +19,11 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-"""This is a termbin.com file for QasteTray."""
+"""This is a termbin file for QasteTray."""
 
 import socket
 
-name = 'termbin.com'
+name = 'termbin'
 url = 'http://termbin.com/'
 expiry_days = [30]
 
@@ -31,7 +31,7 @@ paste_args = ['content']
 
 
 def paste(content):
-    """Make a paste to termbin.com."""
+    """Make a paste to termbin."""
     sock = socket.socket()
     sock.connect(('termbin.com', 9999))
     sock.send(content.encode('utf-8'))

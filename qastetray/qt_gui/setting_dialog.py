@@ -27,7 +27,7 @@ import sys
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QDialogButtonBox, QPushButton
 
-from qastetray.settings import settings
+from qastetray.core.setting_manager import settings
 
 
 class _ColorButton(QtWidgets.QPushButton):
@@ -174,7 +174,7 @@ class _SettingDialog(QtWidgets.QDialog):
 
 def run():
     """Run the setting dialog."""
-    global _dialog      # Avoid garbage collection
+    global _dialog      # Avoid garbage collection.
     _dialog = _SettingDialog()
     _dialog.setWindowTitle(_("QasteTray preferences"))
     _dialog.resize(400, 300)
